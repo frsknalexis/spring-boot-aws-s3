@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headinc :: head"></head>
+<body>
+	<!-- preloader area start -->
+	<div id="preloader">
+		<div class="loader"></div>
+	</div>
+	<!-- page container area start -->
+	<div class="page-container">
+		<div th:replace="fragments/sidebar :: sidebar"></div>
+		<!-- main content area start -->
+		<div class="main-content">
+			<div th:replace="fragments/header-area :: header-area"></div>
+			<!-- page title area start -->
+			<div class="page-title-area">
+				<div class="row align-items-center">
+					<div class="col-sm-6">
+						<div class="breadcrumbs-area clearfix">
+							<h4 class="page-title pull-left">Dashboard</h4>
+							<ul class="breadcrumbs pull-left">
+								<li><a th:href="@{/}">Home</a></li>
+								<li><span>Proyecto Investigacion</span></li>
+							</ul>
+						</div>
+					</div>
+					<div th:replace="fragments/user-profile :: user-profile"></div>
+				</div>
+			</div>
+			<!-- page title area end -->
+			<div class="main-content-inner">
+				<div class="row">
+					<!-- data table start -->
+					<div class="col-12 mt-5">
+						<div class="card">
+							<div class="card-body">
+								<h4 class="header-title" th:text="${titulo}"></h4>
+								<hr />
+								<div class="data-tables datatable-primary">
+									<table id="dataTable" class="text-center progress-table table-hover table-striped" width="100%">
+										<thead class="text-capitalize">
+											<tr>
+												<th>#</th>
+												<th>Investigacion</th>
+												<th>Programa</th>
+												<th>Linea Investigacion</th>
+												<th>Periodo</th>
+												<th>Investigadores</th>
+												<th>Acciones</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="investigacion : ${investigaciones}">
+												<td th:text="${investigacion.asignacionId}"></td>
+												<td th:text="${investigacion.nombreInvestigacion}"></td>
+												<td th:text="${investigacion.lineaInvestigacion.programa.nombrePrograma}"></td>
+												<td th:text="${investigacion.lineaInvestigacion.nombreLineaInvestigacion}"></td>
+												<td th:text="${investigacion.anio}"></td>
+												<td>
+													<a th:href="@{/informeTrimestral/investigadores/} + ${investigacion.asignacionId}" class="btn btn-outline-primary btn-xs"><i class="fa fa-users"></i> Investigadores</a>
+												</td>
+												<td>
+													<div class="btn-group" role="group">
+														<button id="detalleInvestigacion" th:idAsignacion="${investigacion.asignacionId}"
+															data-toggle="modal" class="btn btn-outline-info btn-xs"><i class="fa fa-eye" title="Ver"></i></button> 
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- data table end -->
+					<div class="modal fade" id="modalDetalleInvestigacionInforme">
+                     	<div class="modal-dialog modal-lg" role="document">
+                        	<div class="modal-content">
+                            	<div class="modal-header">
+                                 	<h5 class="modal-title" id="titleDetalleInvestigacionInformeModal"></h5>
+                                    	<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                </div>
+                                <div class="modal-body">
+                                	<h5 class="text-center my-2" id="detalleNombreInvestigacionInforme"></h5>
+                                	<table class="table text-center table-hover" style="width: 760px; margin: 0 auto;">
+									<thead class="bg-primary text-capitalize">
+										<tr>
+											<th>Programa</th>
+											<th>Linea de Accion Prioritarias</th>
+										</tr>
+									</thead>
+									<tbody id="contenidoInvestigacion">
+									</tbody>
+									</table>
+									<h5 class="text-center my-2">Investigadores Responsable (s):</h5>
+                                	<table id="tablaInvestigacionInformeInvestigadores" class="table text-center table-hover" style="width: 760px; margin: 0 auto;">
+									<thead class="bg-primary text-capitalize">
+										<tr>
+											<th>#</th>
+											<th>Investigador</th>
+											<th>Facultad</th>
+											<th>Condicion</th>
+										</tr>
+									</thead>
+									<tbody id="contenidoInvestigacionInformeInvestigadores">
+									</tbody>
+									</table>
+									<div class="alert-items">
+										<div class="alert alert-primary my-2" role="alert" id="alertDetalleInvestigacionInformeInvestigadores">
+										</div>
+									</div>
+									<h5 class="text-center my-2">Informe Trimestral (es): </h5>
+									<table id="tablaInvestigacionInformeInformesTrimestrales" class="table text-center table-hover table-striped" style="width: 760px; margin: 0 auto;">
+										<thead class="bg-primary text-capitalize">
+											<tr>
+												<th>#</th>
+												<th>Descripcion</th>
+												<th>Trimestre</th>
+												<th>Fichero</th>
+												<th>Acciones</th>
+											</tr>
+										</thead>
+										<tbody id="contenidoInvestigacionInformeInformesTrimestrales">
+										</tbody>
+									</table>
+									<div class="alert-items">
+										<div class="alert alert-primary my-2" role="alert" id="alertDetalleInvestigacionInformeInformesTrimestrales">
+										</div>
+									</div>
+                                 </div>
+                                 <div class="modal-footer">
+                                  	<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                 </div>
+                               </div>
+                            </div>
+                         </div>
+				</div>
+			</div>
+		</div>
+		<!-- main content area end -->
+		<footer th:replace="fragments/footer :: footer"></footer>
+	</div>
+	<!-- page container area end -->
+	<th:block th:replace="fragments/script :: script"></th:block>
+</body>
+</html>

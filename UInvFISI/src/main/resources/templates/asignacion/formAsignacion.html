@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headinc :: head"></head>
+<body>
+	<!-- preloader area start -->
+	<div id="preloader">
+		<div class="loader"></div>
+	</div>
+	<!-- page container area start -->
+	<div class="page-container">
+		<div th:replace="fragments/sidebar :: sidebar"></div>
+		<!-- main content area start -->
+		<div class="main-content">
+			<div th:replace="fragments/header-area :: header-area"></div>
+			<!-- page title area start -->
+			<div class="page-title-area">
+				<div class="row align-items-center">
+					<div class="col-sm-6">
+						<div class="breadcrumbs-area clearfix">
+							<h4 class="page-title pull-left">Dashboard</h4>
+							<ul class="breadcrumbs pull-left">
+								<li><a th:href="@{/}">Home</a></li>
+								<li><span>Proyecto Investigacion</span></li>
+							</ul>
+						</div>
+					</div>
+					<div th:replace="fragments/user-profile :: user-profile"></div>
+				</div>
+			</div>
+			<!-- page title area end -->
+			<div class="main-content-inner">
+				<div class="row">
+				<div class="col-sm-6 mt-5">
+						<div class="card">
+							<div class="card-body">
+								<h4 class="header-title" th:text="${titulo}"></h4>
+								<form th:object="${asignacionDocente}"  
+								novalidate="" class="needs-validation" method="post">
+									<div class="form-row">
+										<div class="col-md-12 mb-3">
+											<div class="input-group">
+												<input type="hidden" class="form-control" id="asignacionDocente-id"
+												th:field="*{asignacionDetalleId}" required=""/>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-md-12 mb-3">
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text" id="inputGroupNombreInvestigacion"><i
+														class="fa fa-book"></i></span>
+												</div>
+												<input type="text" class="form-control" placeholder="Nombre Investigacion"
+													id="nombreInvestigacionAsignado" aria-describedby="inputGroupNombreInvestigacion" 
+													 disabled="disabled"  th:value="${asignacionDocente.asignacion.nombreInvestigacion}" />
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-md-12 mb-3">
+											<label for="docenteAsignacion">Investigador: </label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"
+														id="inputGroupDocenteAsignacion"><i
+														class="fa fa-user"></i></span>
+												</div>
+												<input type="text" class="form-control" name="docenteAsignacion" required="" id="docenteAsignacion"
+												aria-describedby="inputGroupDocenteAsignacion" th:field="*{investigador}"/>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-md-12 mb-3">
+											<label for="facultadAsignacion">Facultad: </label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"
+													id="inputGroupFacultadAsignacion">
+													<i class="fa fa-bookmark"></i></span>
+												</div>
+												<select th:field="*{facultad.facultadId}" id="facultadAsignacion" class="form-control">
+													<option value="">Seleccione una Facultad</option>
+													<option th:each="facultad : ${facultades}" th:value="${facultad.facultadId}"
+													th:text="${facultad.abreviaturaFacultad}"/>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-md-12 mb-3">
+											<label for="condicionDocenteAsignacion">Condicion: </label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"
+														id="inputGroupCondicionDocenteAsignacion"><i
+														class="fa fa-suitcase"></i></span>
+												</div>
+												<select th:field="*{condicion.condicionId}" id="condicionDocenteAsignacion" class="form-control">
+													<option value="">Seleccione una Condicion</option>
+													<option th:each="condicion : ${condiciones}" th:value="${condicion.condicionId}"
+													 	th:text="${condicion.nombreCondicion}"/>
+												</select>
+											</div>	
+										</div>
+									</div>
+									<button id="guardarAsignacionDocente" class="btn btn-outline-primary btn-sm" type="submit">
+										<i class="fa fa-check-circle"></i> Guardar Asignacion
+									</button>
+									<button type="button" id="cancelarAsignacionDocente" class="btn btn-outline-danger btn-sm">
+									<i class="fa fa-arrow-circle-o-left"></i> Cancelar</button>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 mt-5">
+						<div class="card">
+							<div class="card-body">
+								<h4 class="header-title text-center" th:text="${asignacionDocente.asignacion.nombreInvestigacion}"></h4>
+								<p class="card-text">Responsable (s):</p>
+								<button id="listarInvestigadoresPorAsignacion" class="btn btn-outline-primary btn-block"
+								 th:idAsignacion="${asignacionDocente.asignacion.asignacionId}" data-toggle="modal">Listar Investigadores</button>			
+							</div>
+						</div>
+					</div>	
+					<div class="modal fade" id="modalListadoInvestigadoresPorAsignacion">
+                     	<div class="modal-dialog modal-lg" role="document">
+                        	<div class="modal-content">
+                            	<div class="modal-header">
+                                 	<h5 class="modal-title" id="titleListadoInvestigadoresPorAsignacionModal"></h5>
+                                    	<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                </div>
+                                <div class="modal-body">
+									<h5 class="text-center my-2">Investigadores Responsable (s):</h5>
+									<table id="tablaListadoInvestigadoresPorAsignacion" class="table text-center table-hover table-striped" style="width: 760px; margin: 0 auto;">
+										<thead class="bg-primary text-capitalize">
+											<tr>
+												<th>#</th>
+												<th>Investigador</th>
+												<th>Facultad</th>
+												<th>Condicion</th>
+												<th>Estado</th>
+												<th>Acciones</th>
+											</tr>
+										</thead>
+										<tbody id="contenidoListadoInvestigadoresPorAsignacion">
+										</tbody>
+									</table>
+									<div class="alert-items">
+										<div class="alert alert-primary my-2" role="alert" id="listadoInvestigadoresPorAsignacion">
+										</div>
+									</div>
+                                 </div>
+                                 <div class="modal-footer">
+                                  	<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                 </div>
+                               </div>
+                            </div>
+                         </div>
+				</div>
+			</div>
+		</div>
+		<!-- main content area end -->
+		<footer th:replace="fragments/footer :: footer"></footer>
+	</div>
+	<!-- page container area end -->
+	<th:block th:replace="fragments/script :: script"></th:block>
+</body>
+</html>
