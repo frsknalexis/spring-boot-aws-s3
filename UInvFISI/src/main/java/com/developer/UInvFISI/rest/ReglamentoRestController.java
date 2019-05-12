@@ -2,6 +2,7 @@ package com.developer.UInvFISI.rest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -139,20 +140,7 @@ public class ReglamentoRestController {
 	@GetMapping(value=Constantes.DOWNLOAD_URI)
 	public ResponseEntity<Resource> downloadFile(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO)
-								.resolve(filename).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			
-			resource = new UrlResource(pathFile.toUri());
-			if(!resource.exists() || !resource.isReadable()) {
-				throw new RuntimeException("Error: no se puede leer el archivo " + pathFile.toString());
-			}
-		}
-		catch(MalformedURLException e) {
-			e.printStackTrace();
-		}
+		Resource resource = amazonService.loadAsResource(filename);
 		
 		String contentType = null;
 		
@@ -176,14 +164,16 @@ public class ReglamentoRestController {
 	@GetMapping(value=Constantes.VIEW_PDF_URI)
 	public ResponseEntity<Resource> viewPDF(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO)
+		/*Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO)
 							.resolve(filename).toAbsolutePath();
 		
 		Resource resource = null;
 		
+		URI uri = pathFile.toUri();
+		
 		try {
 			
-			resource = new UrlResource(pathFile.toUri());
+			resource = new UrlResource(uri);
 			if(!resource.exists() || !resource.isReadable()) {
 				throw new RuntimeException("Error: no se puede leer el archivo " + pathFile.toString());
 			}
@@ -191,6 +181,10 @@ public class ReglamentoRestController {
 		catch(MalformedURLException e) {
 			e.printStackTrace();
 		}
+		
+		*/
+		
+		Resource resource = amazonService.loadAsResource(filename);
 		
 		String contentType = null;
 		
