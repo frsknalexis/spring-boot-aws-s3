@@ -1,9 +1,7 @@
 package com.developer.UInvFISI.rest;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.developer.UInvFISI.entity.Reglamento;
+import com.developer.UInvFISI.service.AmazonService;
 import com.developer.UInvFISI.service.ReglamentoService;
 import com.developer.UInvFISI.util.Constantes;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +38,10 @@ public class ReglamentoRestController {
 	@Autowired
 	@Qualifier("reglamentoService")
 	private ReglamentoService reglamentoService;
+	
+	@Autowired
+	@Qualifier("amazonService")
+	private AmazonService amazonService;
 	
 	ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -72,19 +75,10 @@ public class ReglamentoRestController {
 			Reglamento reglamento = objectMapper.readValue(reglamentoJson, Reglamento.class);
 			if(!file.isEmpty()) {
 				
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO).resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					reglamento.setNombreFichero(file.getOriginalFilename());
-					reglamento.setFormatoFichero(file.getContentType());
-					reglamento.setTamanioFichero(Long.toString(file.getSize()));
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+				String nombreFichero = amazonService.uploadFile(file);
+				reglamento.setNombreFichero(nombreFichero);
+				reglamento.setFormatoFichero(file.getContentType());
+				reglamento.setTamanioFichero(Long.toString(file.getSize()));
 			}
 			
 			reglamentoService.saveOrUpdate(reglamento);
@@ -122,29 +116,13 @@ public class ReglamentoRestController {
 				if(reglamentoOld.getReglamentoId()!= null && reglamentoOld.getReglamentoId() > 0
 					&& reglamentoOld.getNombreFichero() != null && reglamentoOld.getNombreFichero().length() > 0) {
 					
-					Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO)
-							.resolve(reglamentoOld.getNombreFichero()).toAbsolutePath();
-					File archivo = rootPath.toFile();
-					
-					if(archivo.exists() && archivo.canRead()) {
-						archivo.delete();
-					}
+					amazonService.deleteFile(reglamentoOld.getNombreFichero());
 				}
 				
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_REGLAMENTO)
-						.resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					reglamentoOld.setNombreFichero(file.getOriginalFilename());
-					reglamentoOld.setFormatoFichero(file.getContentType());
-					reglamentoOld.setTamanioFichero(Long.toString(file.getSize()));
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+				String nombreFichero = amazonService.uploadFile(file);
+				reglamentoOld.setNombreFichero(nombreFichero);
+				reglamentoOld.setFormatoFichero(file.getContentType());
+				reglamentoOld.setTamanioFichero(Long.toString(file.getSize()));
 			}
 			
 			reglamentoOld.setAsunto(reglamento.getAsunto());
