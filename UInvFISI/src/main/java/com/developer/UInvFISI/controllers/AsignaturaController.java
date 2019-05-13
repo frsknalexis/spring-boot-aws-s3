@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import com.developer.UInvFISI.entity.Asignatura;
-import com.developer.UInvFISI.entity.Docente;
 import com.developer.UInvFISI.entity.Escuela;
 
 import com.developer.UInvFISI.service.AsignaturaService;

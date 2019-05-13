@@ -1,11 +1,6 @@
 package com.developer.UInvFISI.rest;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.developer.UInvFISI.entity.AsignacionDocente;
 import com.developer.UInvFISI.entity.InformeTrimestral;
+import com.developer.UInvFISI.service.AmazonService;
 import com.developer.UInvFISI.service.AsignacionDocenteService;
 import com.developer.UInvFISI.service.InformeTrimestralService;
 import com.developer.UInvFISI.util.Constantes;
@@ -45,6 +40,10 @@ public class InformeTrimestralRestController {
 	@Autowired
 	@Qualifier("asignacionDocenteService")
 	private AsignacionDocenteService asignacionDocenteService;
+	
+	@Autowired
+	@Qualifier("amazonService")
+	private AmazonService amazonService;
 	
 	ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -134,20 +133,10 @@ public class InformeTrimestralRestController {
 			
 			if(!file.isEmpty()) {
 				
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_INFORMES_TRIMESTRALES)
-										.resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					informeTrimestral.setNombreFichero(file.getOriginalFilename());
-					informeTrimestral.setFormatoFichero(file.getContentType());
-					informeTrimestral.setTamanioFichero(file.getSize());
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+				String nomnbreFichero = amazonService.uploadFile(file);
+				informeTrimestral.setNombreFichero(nomnbreFichero);
+				informeTrimestral.setFormatoFichero(file.getContentType());
+				informeTrimestral.setTamanioFichero(file.getSize());
 			}
 			
 			informeTrimestral.setAsignacionDetalle(asignacionDetalle);
@@ -192,29 +181,13 @@ public class InformeTrimestralRestController {
 				if(informeTrimestralOld.getInformeTrimestralId() != null && informeTrimestralOld.getInformeTrimestralId() > 0
 						&& informeTrimestralOld.getNombreFichero() != null && informeTrimestralOld.getNombreFichero().length() > 0) {
 					
-					Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_INFORMES_TRIMESTRALES)
-											.resolve(informeTrimestralOld.getNombreFichero()).toAbsolutePath();
-					File archivo = rootPath.toFile();
-					
-					if(archivo.exists() && archivo.canRead()) {
-						archivo.delete();
-					}
+					amazonService.deleteFile(informeTrimestralOld.getNombreFichero());
 				}
 				
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_INFORMES_TRIMESTRALES)
-										.resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					informeTrimestralOld.setNombreFichero(file.getOriginalFilename());
-					informeTrimestralOld.setFormatoFichero(file.getContentType());
-					informeTrimestralOld.setTamanioFichero(file.getSize());
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+				String nombreFichero = amazonService.uploadFile(file);
+				informeTrimestralOld.setNombreFichero(nombreFichero);
+				informeTrimestralOld.setFormatoFichero(file.getContentType());
+				informeTrimestralOld.setTamanioFichero(file.getSize());
 			}
 			
 			informeTrimestralOld.setAsignacionDetalle(asignacionDetalle);
@@ -235,20 +208,7 @@ public class InformeTrimestralRestController {
 	@GetMapping(value=Constantes.DOWNLOAD_URI)
 	public ResponseEntity<Resource> downloadFile(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_INFORMES_TRIMESTRALES)
-								.resolve(filename).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			
-			resource = new UrlResource(pathFile.toUri());
-			if(!resource.exists() || !resource.isReadable()) {
-				throw new RuntimeException("Error: no se puede leer el archivo: " + pathFile.toString());
-			}
-		}
-		catch(MalformedURLException e) {
-			e.printStackTrace();
-		}
+		Resource resource = amazonService.loadAsResource(filename);
 		
 		String contentType = null;
 		
@@ -272,19 +232,7 @@ public class InformeTrimestralRestController {
 	@GetMapping(value=Constantes.VIEW_PDF_URI)
 	public ResponseEntity<Resource> viewPDF(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_INFORMES_TRIMESTRALES)
-									.resolve(filename).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			resource = new UrlResource(pathFile.toUri());
-			if(!resource.exists() || !resource.isReadable()) {
-				throw new RuntimeException("Error: no se puede leer el archivo: " + pathFile.toString());
-			}
-		}
-		catch(MalformedURLException e) {
-			e.printStackTrace();
-		}
+		Resource resource = amazonService.loadAsResource(filename);
 		
 		String contentType = null;
 		

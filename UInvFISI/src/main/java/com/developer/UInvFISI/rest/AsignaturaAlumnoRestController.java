@@ -1,11 +1,6 @@
 package com.developer.UInvFISI.rest;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.developer.UInvFISI.entity.Asignatura;
 import com.developer.UInvFISI.entity.AsignaturaAlumno;
+import com.developer.UInvFISI.service.AmazonService;
 import com.developer.UInvFISI.service.AsignaturaAlumnoService;
 import com.developer.UInvFISI.service.AsignaturaService;
 import com.developer.UInvFISI.util.Constantes;
@@ -45,6 +40,10 @@ public class AsignaturaAlumnoRestController {
 	@Autowired
 	@Qualifier("asignaturaService")
 	private AsignaturaService asignaturaService;
+	
+	@Autowired
+	@Qualifier("amazonService")
+	private AmazonService amazonService;
 	
 	ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -115,20 +114,10 @@ public class AsignaturaAlumnoRestController {
 			
 			if(!file.isEmpty()) {
 			
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_ARCHIVO_ALUMNOS)
-										.resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					asignaturaAlumno.setNombreFichero(file.getOriginalFilename());
-					asignaturaAlumno.setFormatoFichero(file.getContentType());
-					asignaturaAlumno.setTamanioFichero(Long.toString(file.getSize()));
-					
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+				String nombreFichero = amazonService.uploadFile(file);
+				asignaturaAlumno.setNombreFichero(nombreFichero);
+				asignaturaAlumno.setFormatoFichero(file.getContentType());
+				asignaturaAlumno.setTamanioFichero(Long.toString(file.getSize()));
 			}
 			
 			asignaturaAlumno.setAsignatura(asignatura);
@@ -167,29 +156,13 @@ public class AsignaturaAlumnoRestController {
 				if(asignaturaAlumnoOld.getAsignaturaDetalleId() != null && asignaturaAlumnoOld.getAsignaturaDetalleId() > 0
 						&& asignaturaAlumnoOld.getNombreFichero() != null && asignaturaAlumnoOld.getNombreFichero().length() > 0) {
 					
-					Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_ARCHIVO_ALUMNOS)
-												.resolve(asignaturaAlumnoOld.getNombreFichero()).toAbsolutePath();
-					File archivo = rootPath.toFile();
-					
-					if(archivo.exists() && archivo.canRead()) {
-						archivo.delete();
-					}					
+					amazonService.deleteFile(asignaturaAlumnoOld.getNombreFichero());
 				}
 				
-				Path rootPath = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_ARCHIVO_ALUMNOS)
-										.resolve(file.getOriginalFilename());
-				Path rootAbsolutePath = rootPath.toAbsolutePath();
-				
-				try {
-					
-					Files.copy(file.getInputStream(), rootAbsolutePath);
-					asignaturaAlumnoOld.setNombreFichero(file.getOriginalFilename());
-					asignaturaAlumnoOld.setFormatoFichero(file.getContentType());
-					asignaturaAlumnoOld.setTamanioFichero(Long.toString(file.getSize()));
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}	
+				String nombreFichero = amazonService.uploadFile(file);
+				asignaturaAlumnoOld.setNombreFichero(nombreFichero);
+				asignaturaAlumnoOld.setFormatoFichero(file.getContentType());
+				asignaturaAlumnoOld.setTamanioFichero(Long.toString(file.getSize()));	
 			}
 			
 			asignaturaAlumnoOld.setAsignatura(asignatura);
@@ -212,23 +185,8 @@ public class AsignaturaAlumnoRestController {
 	@GetMapping(value=Constantes.DOWNLOAD_URI)
 	public ResponseEntity<Resource> downloadFile(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_ARCHIVO_ALUMNOS)
-								.resolve(filename).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			
-			resource = new UrlResource(pathFile.toUri());
-			if(!resource.exists() || !resource.isReadable()) {
+		Resource resource = amazonService.loadAsResource(filename); 
 				
-				throw new RuntimeException("Error: no se puede leer el archivo " + pathFile.toString());
-			}
-		}
-		catch(MalformedURLException e) {
-			
-			e.printStackTrace();
-		}
-		
 		String contentType = null;
 		
 		try {
@@ -252,22 +210,7 @@ public class AsignaturaAlumnoRestController {
 	@GetMapping(value=Constantes.VIEW_PDF_URI)
 	public ResponseEntity<Resource> viewPDF(@PathVariable String filename, HttpServletRequest request) {
 		
-		Path pathFile = Paths.get(Constantes.UPLOAD_FOLDER_BASE).resolve(Constantes.FOLDER_ARCHIVO_ALUMNOS)
-								.resolve(filename).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			
-			resource = new UrlResource(pathFile.toUri());
-			if(!resource.exists() || !resource.isReadable()) {
-				
-				throw new RuntimeException("Error: no se puede leer el archivo " + pathFile.toString());
-			}
-		}
-		catch(MalformedURLException e) {
-			
-			e.printStackTrace();
-		}
+		Resource resource = amazonService.loadAsResource(filename);
 		
 		String contentType = null;
 		

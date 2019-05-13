@@ -14,8 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @Table(name="tbl_docentes", schema="public")
 public class Docente extends BaseEntity implements Serializable{
