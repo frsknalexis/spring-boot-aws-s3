@@ -1,13 +1,13 @@
 package com.developer.UInvFISI.rest;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -180,50 +180,24 @@ public class InformeTrabajoRestController {
 	}
 	
 	@GetMapping(value=Constantes.DOWNLOAD_URI)
-	public ResponseEntity<Resource> downloadFile(@PathVariable String filename, HttpServletRequest request) {
+	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String filename, HttpServletRequest request) {
 		
-		Resource resource = amazonService.loadAsResource(filename);
-				
-		String contentType = null;
-		
-		try {
-			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(contentType == null) {
-			contentType = Constantes.DEFAULT_CONTENT_TYPE;
-		}
-		
+		 ByteArrayInputStream bis = amazonService.getResource(filename);
+					
 		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, String.format(Constantes.FILE_DOWNLOAD_HTTP_HEADER, resource.getFilename()))
-				.body(resource);
+				.contentType(MediaType.APPLICATION_PDF)
+				.header(HttpHeaders.CONTENT_DISPOSITION, String.format(Constantes.FILE_DOWNLOAD_HTTP_HEADER, filename))
+				.body(new InputStreamResource(bis));
 	}
 	
 	@GetMapping(value=Constantes.VIEW_PDF_URI)
-	public ResponseEntity<Resource> viewPDF(@PathVariable String filename, HttpServletRequest request) {
+	public ResponseEntity<InputStreamResource> viewPDF(@PathVariable String filename, HttpServletRequest request) {
 		
-		Resource resource = amazonService.loadAsResource(filename);
-		
-		String contentType = null;
-		
-		try {
-			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(contentType == null) {
-			contentType = Constantes.DEFAULT_CONTENT_TYPE;
-		}
+		 ByteArrayInputStream bis = amazonService.getResource(filename);
 		
 		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, String.format(Constantes.VIEW_PDF_HTTP_HEADER, resource.getFilename()))
-				.body(resource);
+				.contentType(MediaType.APPLICATION_PDF)
+				.header(HttpHeaders.CONTENT_DISPOSITION, String.format(Constantes.VIEW_PDF_HTTP_HEADER, filename))
+				.body(new InputStreamResource(bis));
 	}
 }

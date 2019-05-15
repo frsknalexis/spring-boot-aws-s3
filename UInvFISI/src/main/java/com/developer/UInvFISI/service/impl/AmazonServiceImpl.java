@@ -1,15 +1,14 @@
 package com.developer.UInvFISI.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,25 +61,6 @@ public class AmazonServiceImpl implements AmazonService {
 		}
 	}
 	
-	@Override
-	public Resource loadAsResource(String fileName) {
-		
-		Resource resource = null;
-		S3Object s3Object = getObjectFromS3Bucket(fileName, awsBucketName);
-		URI url = s3Object.getObjectContent().getHttpRequest().getURI();
-		
-		try {
-			
-			resource = new UrlResource(url);
-			if(!resource.exists() || !resource.isReadable()) {
-				throw new RuntimeException("Error: no se puede leer el archivo " + resource.getFilename());
-			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return resource;
-	}
-	
 	private void uploadFileToS3Bucket(String fileName, File file, String bucketName) {
 		
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName, file);
@@ -114,5 +94,45 @@ public class AmazonServiceImpl implements AmazonService {
 			e.getMessage();
 		}
 		return convertedFile;
+	}
+
+	@Override
+	public ByteArrayOutputStream loadResource(String fileName) {
+		
+		S3Object s3Object = getObjectFromS3Bucket(fileName, awsBucketName);
+		InputStream is = s3Object.getObjectContent();
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int leng; 
+		byte[] buffer = new byte[10240];
+		try {
+			while((leng = is.read(buffer, 0, buffer.length)) != -1) {
+				baos.write(buffer, 0, leng);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return baos;
+	}
+
+	@Override
+	public ByteArrayInputStream getResource(String fileName) {
+		
+		S3Object s3Object = getObjectFromS3Bucket(fileName, awsBucketName);
+		InputStream is = s3Object.getObjectContent();
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		
+		int leng; 
+		byte[] buffer = new byte[10240];
+		try {
+			while((leng = is.read(buffer, 0, buffer.length)) != -1) {
+				out.write(buffer, 0, leng);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return new ByteArrayInputStream(out.toByteArray());
 	}
 }

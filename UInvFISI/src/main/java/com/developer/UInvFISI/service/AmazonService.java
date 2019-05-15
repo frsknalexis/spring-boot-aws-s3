@@ -1,6 +1,8 @@
 package com.developer.UInvFISI.service;
 
-import org.springframework.core.io.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AmazonService {
@@ -9,5 +11,7 @@ public interface AmazonService {
 	
 	void deleteFile(String fileName);
 	
-	Resource loadAsResource(String fileName);
+	ByteArrayOutputStream loadResource(String fileName);
+	
+	ByteArrayInputStream getResource(String fileName);
 }
