@@ -33,7 +33,6 @@ public class LoginController {
 			model.put("usuario", usuario);
 			return "redirect:/inicio";
 		}
-		
 		return "login";
 	}
 }

@@ -50,8 +50,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		usuario.setPassword(encoder.encode(usuario.getPassword()));
 		Rol rol = rolRepository.findByNombre("ADMIN_USER");
-		rol.setFechaRegistro(new Date());
-		rol.setHabilitado(true);
 		List<Rol> roles = new ArrayList<>();
 		roles.add(rol);
 		usuario.setRoles(roles);
