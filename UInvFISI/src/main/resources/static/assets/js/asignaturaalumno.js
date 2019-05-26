@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 $(document).on('ready', function() {
 		
 	$('#fileAlumno').on('change', function() {
@@ -10,20 +6,32 @@ $(document).on('ready', function() {
 		
 		var archivo = $('#fileAlumno').val();
 		
-		var extensionPermitida = ".pdf";
+		console.log("archivo: " + archivo);
+		
+		var extensionesPermitidas = new Array(".pdf", ".doc", ".docx", ".xls", ".xlsx");
 		
 		var extension = (archivo.substring(archivo.lastIndexOf("."))).toLowerCase();
 		
-		if(extension  == extensionPermitida) {
+		var permitido = false;
+		
+		for(var i = 0; i < extensionesPermitidas.length; i++) {
+			
+			if(extensionesPermitidas[i] == extension) {
+				permitido = true;
+				break;
+			}
+		}
+		
+		if(permitido) {
 			
 			filePreview(this);
 		}
-		else {
+		else if(!permitido) {
 			
 			swal({
                 type: 'error',
                 title: 'Ooops',
-                text: 'Asegurate de haber selecciondo un archivo PDF'
+                text: 'Asegurate de haber selecciondo un archivo permitido'
             });
 			
 			archivoInput.val("");
@@ -51,7 +59,7 @@ $(document).on('ready', function() {
 	
 		
 		if($('#alumnoAsignatura').val().match(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/) && $('#documentoAlumno').val().trim() != ""
-			&& $('#nroDocumentoAlumno').val().match(/^[0-9]+$/) && $('#asuntoAsignaturaAlumno').val().match(/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\-\s]+$/)) {
+			&& $('#nroDocumentoAlumno').val().match(/^[0-9]{8,11}$/) && $('#asuntoAsignaturaAlumno').val().match(/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\-\s]+$/)) {
 			
 			var asignaturaId = localStorage.getItem("asignaturaId");
 			console.log("asignaturaId: " + asignaturaId);
@@ -220,7 +228,7 @@ $(document).on('ready', function() {
 			
 			else {
 				
-				if(!($('#nroDocumentoAlumno').val().match(/^[0-9]+$/))) {
+				if(!($('#nroDocumentoAlumno').val().match(/^[0-9]{8,11}$/))) {
 					
 					swal({
 		                type: 'error',

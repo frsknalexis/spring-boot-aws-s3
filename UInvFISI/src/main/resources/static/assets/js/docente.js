@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 $(document).on('ready', function() {
 	
 	$('#guardarDocente').click(function(e) {
@@ -10,7 +6,7 @@ $(document).on('ready', function() {
 		
 		if($('#nombreDocente').val().match(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/) && $('#apellidoDocente').val().match(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/)
 				&& $('#categoriaDocente').val().trim() != "" && $('#documentoDocente').val().trim() != ""
-				&& $('#nroDocumentoDocente').val().match(/^[0-9]+$/) && $('#regimenDedicacionDocente').val().trim() != ""
+				&& $('#nroDocumentoDocente').val().match(/^[0-9]{8,11}$/) && $('#regimenDedicacionDocente').val().trim() != ""
 				&& $('#dinaDatosAcademicos').val().trim() != "" && $('#dinaProyectosInvestigacion').val().trim() != ""
 				&& $('#codigoOrcid').val().match(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/)
 				&& $('#publicacionesOrcid').val() >= 0) {
@@ -269,7 +265,7 @@ $(document).on('ready', function() {
 				
 				else {
 					
-					if(!($('#nroDocumentoDocente').val().match(/^[0-9]+$/))) {
+					if(!($('#nroDocumentoDocente').val().match(/^[0-9]{8,11}$/))) {
 						
 						swal({
 			                type: 'error',

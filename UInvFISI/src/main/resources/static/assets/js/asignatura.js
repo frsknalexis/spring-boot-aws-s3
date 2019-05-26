@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#guardarAsignatura').click(function(e) {

@@ -16,8 +16,8 @@ $(document).ready(function() {
 		e.preventDefault();
 		
 		if($('#autorAsignacion').val().match(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/) && $('#emailAsignacion').val().match(/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/)
-				&& $('#celularAsignacion').val().match(/^[0-9]+$/) && $('#documentoAsignacion').val().trim() != "" 
-				&& $('#nmrAsignacion').val().match(/^[0-9]+$/) && $('#condicionDocenteAsignacion').val().trim() != "") {
+				&& $('#celularAsignacion').val().match(/^[0-9]{7,9}$/) && $('#documentoAsignacion').val().trim() != "" 
+				&& $('#nmrAsignacion').val().match(/^[0-9]{8,11}$/) && $('#condicionDocenteAsignacion').val().trim() != "") {
 			
 			var trabajoId = localStorage.getItem("trabajoId");
 			console.log("trabajoId: " + trabajoId);
@@ -224,7 +224,7 @@ $(document).ready(function() {
 				}
 				else {
 					
-					if(!($('#celularAsignacion').val().match(/^[0-9]+$/))) {
+					if(!($('#celularAsignacion').val().match(/^[0-9]{7,9}$/))) {
 						
 						swal({
 			                type: 'error',
@@ -238,7 +238,7 @@ $(document).ready(function() {
 					}
 					else {
 						
-						if(!($('#nmrAsignacion').val().match(/^[0-9]+$/))) {
+						if(!($('#nmrAsignacion').val().match(/^[0-9]{8,11}$/))) {
 							
 							swal({
 				                type: 'error',

@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#guardarCondicionDocente').click(function(e) {

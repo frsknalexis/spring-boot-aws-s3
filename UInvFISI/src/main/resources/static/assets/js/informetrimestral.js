@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#fileInformeTrimestral').on('change', function() {
@@ -9,20 +6,30 @@ $(document).on('ready', function() {
 		
 		var file = $('#fileInformeTrimestral').val();
 		
-		var extensionPermitida = ".pdf";
+		var extensionesPermitidas = new Array(".pdf", ".doc", ".docx", ".xls", ".xlsx");
 		
 		var extension = (file.substring(file.lastIndexOf("."))).toLowerCase();
 		
-		if(extension == extensionPermitida) {
+		var permitido = false;
+		
+		for(var i = 0; i < extensionesPermitidas.length; i++) {
+			
+			if(extensionesPermitidas[i] == extension) {
+				permitido = true;
+				break;
+			}
+		}
+		
+		if(permitido) {
 			
 			fileInformeTrimestralPreview(this);
 		}
-		else {
+		else if(!permitido) {
 			
 			swal({
                 type: 'error',
                 title: 'Ooops',
-                text: 'Asegurate de haber selecciondo un archivo PDF'
+                text: 'Asegurate de haber selecciondo un archivo permitido'
             });
 			
 			fileInput.val("");

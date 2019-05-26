@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#guardarPrograma').click(function(e) {

@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#guardarRegimenDedicacion').click(function(e) {

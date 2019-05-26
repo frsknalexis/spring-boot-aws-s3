@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 $(document).on('ready', function() {
 	
 	$.ajax({

@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#dataTable tbody').on('click', 'button#detalleInvestigacion', function() {

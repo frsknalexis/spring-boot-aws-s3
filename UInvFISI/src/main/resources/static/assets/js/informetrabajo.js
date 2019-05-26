@@ -1,6 +1,3 @@
-/**
- * 
- */
 $(document).on('ready', function() {
 	
 	$('#cancelarInformeTrabajo').on('click', function() {
@@ -13,19 +10,29 @@ $(document).on('ready', function() {
 		
 		var fileInput = $('#fileInformeTrabajo');
 		var file = $('#fileInformeTrabajo').val();
-		var extensionPermitida = ".pdf";
+		var extensionesPermitidas = new Array(".pdf", ".doc", ".docx", ".xls", ".xlsx");
 		var extension = (file.substring(file.lastIndexOf("."))).toLowerCase();
 		
-		if(extension == extensionPermitida) {
+		var permitido = false;
+		
+		for(var i = 0; i < extensionesPermitidas.length; i++) {
+			
+			if(extensionesPermitidas[i] == extension) {
+				permitido = true;
+				break;
+			}
+		}
+		
+		if(permitido) {
 			
 			fileInformeTrabajoPreview(this);
 		}
-		else {
+		else if(!permitido) {
 			
 			swal({
                 type: 'error',
                 title: 'Ooops',
-                text: 'Asegurate de haber selecciondo un archivo PDF'
+                text: 'Asegurate de haber selecciondo un archivo permitido'
             });
 			
 			fileInput.val("");

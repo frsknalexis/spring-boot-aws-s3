@@ -1,8 +1,5 @@
-/**
- * 
- */
-
 $(document).on('ready', function() {
+	
 	
 	$('#fileReglamento').on('change', function() {
 		
@@ -10,40 +7,49 @@ $(document).on('ready', function() {
 		
 		var file = $('#fileReglamento').val();
 		
-		var extensionPermitida = ".pdf";
+		console.log("file: " + file);
+		
+		var extensionesPermitidas = new Array(".pdf", ".doc", ".docx", ".xls", ".xlsx");
 		
 		var extension = (file.substring(file.lastIndexOf("."))).toLowerCase();
 		
-		if(extension == extensionPermitida) {
+		var permitido = false;
+		
+		for(var i = 0; i < extensionesPermitidas.length; i++) {
 			
-			fileReglamentoPreview(this);
+			if(extensionesPermitidas[i] == extension) {
+				permitido = true;
+				break;
+			}
 		}
-		else {
+		
+		if(!permitido) {
 			
 			swal({
                 type: 'error',
                 title: 'Ooops',
-                text: 'Asegurate de haber selecciondo un archivo PDF'
+                text: 'Asegurate de haber selecciondo un archivo permitido'
             });
 			
 			fileInput.val("");
 			return false;
 		}
 		
+		else if(permitido) {
+			
+			fileReglamentoPreview(this);
+		}		
 	});
 	
-	function fileReglamentoPreview(input) {
+	function fileReglamentoPreview(fileInput) {
 		
-		if(input.files && input.files[0]) {
-			
-			var visor = new FileReader();
-			visor.onload = function(e) {
-				
-				$('#visorArchivoReglamento').html('<embed src="' + e.target.result + '" width="100%" height="800">');
-			};
-			
-			visor.readAsDataURL(input.files[0]);
-		}
+		if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+            	$('#visorArchivoReglamento').html('<embed src="' + e.target.result + '" width="100%" height="800">');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
 	}
 	
 	$('#guardarReglamento').click(function(e) {

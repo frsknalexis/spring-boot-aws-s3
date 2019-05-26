@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 $(document).on('ready', function() {
 	
 	$('#dataTable tbody').on('click', 'button#adjuntarInformeTrimestral', function() {

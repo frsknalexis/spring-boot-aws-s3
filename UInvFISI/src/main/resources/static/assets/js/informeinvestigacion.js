@@ -9,21 +9,31 @@ $(document).on('ready', function() {
 		
 		var file = $('#fileInformeInvestigacion').val();
 		
-		var extensionPermitida = ".pdf";
+		var extensionesPermitidas = new Array(".pdf", ".doc", ".docx", ".xls", ".xlsx");
 		
 		var extension = (file.substring(file.lastIndexOf("."))).toLowerCase();
 		
-		if(extension == extensionPermitida) {
+		var permitida = false;
+		
+		for(var i = 0; i < extensionesPermitidas.length; i++) {
+			
+			if(extensionesPermitidas[i] == extension) {
+				permitida = true;
+				break;
+			}
+		}
+		
+		if(permitida) {
 			
 			fileInformeInvestigacionPreview(this);
 		}
 		
-		else {
+		else if(!permitida) {
 			
 			swal({
                 type: 'error',
                 title: 'Ooops',
-                text: 'Asegurate de haber selecciondo un archivo PDF'
+                text: 'Asegurate de haber selecciondo un archivo permitido'
             });
 			
 			fileInput.val("");
